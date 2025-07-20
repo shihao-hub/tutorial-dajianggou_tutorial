@@ -1,0 +1,18 @@
+loguru
+
+django
+
+django-debug-toolbar # django-debug-toolbar is a very powerful performance detection tool for django
+djdt_flamegraph # [unused]
+
+django-guardian # [unused] reference link: https://pythondjango.cn/django/advanced/8-permissions/
+
+python-memcached # Memcached is a high-performance distributed in-memory object caching system
+ipython
+
+celery # [unused] reference link: https://pythondjango.cn/django/advanced/12-sync-periodic-tasks-with-celery/
+redis
+eventlet
+django-celery-beat
+django-celery-results
+
