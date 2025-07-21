@@ -20,3 +20,4 @@ eventlet
 django-celery-beat
 django-celery-results
 
+lupa
