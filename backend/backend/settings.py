@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "rest_framework",
+    "drf_spectacular",
+
     # 【知识点】为了弥补 Django 自带权限机制的不足
     # - Django 自带的权限机制是针对模型的，用户可以获得对所有文章对象进行修改的权限
     # - 如果我们希望实现对单个文章对象的权限管理，我们需要借助于第三方库比如 django-guardian
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
 
     "apps.core",
     "apps.blog",
+    "apps.tasks",
 
     "debug_toolbar",
 ]
@@ -132,6 +136,38 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ------------------------------------ djangorestframework ------------------------------------ #
+# drf 配置字典
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50,
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
+    # 返回 response 对象所用的类
+    'DEFAULT_RENDER_CLASSES': [
+        'rest_framework.renders.JSONRenderer',
+        'rest_framework.renders.BrowsableAPIRenderer',
+    ],
+    # 解析器，如何解析 request 请求中的 request.data
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+    # 权限相关配置：必须登录才能调用接口
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'UNAUTHENTICATED_USER': None,  # 未认证时不设置匿名用户
+    # 认证相关配置
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    # "URL_FIELD_NAME": 'link', # todo: [to be understood] URL_FIELD_NAME
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # drf_spectacular 接口文档生成
+}
 
 # ------------------------------------ python-memcached ------------------------------------ #
 # 【知识点】配置缓存
