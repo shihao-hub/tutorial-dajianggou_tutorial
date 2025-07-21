@@ -23,57 +23,58 @@ tip:
 import copy
 import msvcrt
 import os.path
+import getpass
+import time
 import sys
 import subprocess
+import signal
 from pathlib import Path
 from typing import List, Union
 
 
-def main():
-    import subprocess
-    import sys
-    import time
-    import getpass
-    from pathlib import Path
-    import signal
+# 设置颜色代码
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-    # 设置颜色代码
-    class Colors:
-        HEADER = '\033[95m'
-        OKBLUE = '\033[94m'
-        OKCYAN = '\033[96m'
-        OKGREEN = '\033[92m'
-        WARNING = '\033[93m'
-        FAIL = '\033[91m'
-        ENDC = '\033[0m'
-        BOLD = '\033[1m'
-        UNDERLINE = '\033[4m'
 
+class ColoredPrint:
+    @staticmethod
     def print_header(text):
         """打印带样式的标题"""
         print(f"\n{Colors.HEADER}{Colors.BOLD}{'=' * 60}{Colors.ENDC}")
         print(f"{Colors.HEADER}{Colors.BOLD}{text.center(60)}{Colors.ENDC}")
         print(f"{Colors.HEADER}{Colors.BOLD}{'=' * 60}{Colors.ENDC}\n")
 
+    @staticmethod
     def print_success(text):
         """打印成功信息"""
         print(f"{Colors.OKGREEN}✓ {text}{Colors.ENDC}")
 
+    @staticmethod
     def print_warning(text):
         """打印警告信息"""
         print(f"{Colors.WARNING}⚠ {text}{Colors.ENDC}")
 
+    @staticmethod
     def print_error(text):
         """打印错误信息"""
         print(f"{Colors.FAIL}✗ {text}{Colors.ENDC}")
 
+    @staticmethod
     def print_step(text):
         """打印步骤信息"""
         print(f"{Colors.OKCYAN}→ {text}{Colors.ENDC}")
 
-    # ---------------------------------------------------------------------------------------------------------------- #
-    # ---------------------------------------------------------------------------------------------------------------- #
 
+def main():
     def run_command(command: Union[str, List[str]], capture_output=False, cwd=None, shell=False):
         """运行命令并返回结果"""
         old_command = command
@@ -114,11 +115,11 @@ def main():
                 subprocess.run(command, check=True, cwd=cwd, shell=shell)
                 return True
         except subprocess.CalledProcessError as e:
-            print_error(f"命令执行失败: {' '.join(command) if isinstance(command, list) else command}")
-            print_error(f"错误信息: {e.stderr if capture_output else str(e)}")
+            ColoredPrint.print_error(f"命令执行失败: {' '.join(command) if isinstance(command, list) else command}")
+            ColoredPrint.print_error(f"错误信息: {e.stderr if capture_output else str(e)}")
             return False
         except Exception as e:
-            print_error(f"未知错误: {str(e)}")
+            ColoredPrint.print_error(f"未知错误: {str(e)}")
             return False
         finally:
             command = old_command
@@ -131,46 +132,46 @@ def main():
 
     def setup_git():
         """初始化 Git 仓库并提交初始代码"""
-        print_header("步骤 1: Git 初始化")
+        ColoredPrint.print_header("步骤 1: Git 初始化")
 
         if _is_git_repo("."):
-            print_success("Git 仓库已存在，跳过初始化")
+            ColoredPrint.print_success("Git 仓库已存在，跳过初始化")
             return True
 
-        print_step("初始化 Git 仓库")
+        ColoredPrint.print_step("初始化 Git 仓库")
         if not run_command(["git", "init"]):
             return False
 
-        print_step("添加所有文件到暂存区")
+        ColoredPrint.print_step("添加所有文件到暂存区")
         if not run_command(["git", "add", "."]):
             return False
 
-        print_step("提交初始代码")
+        ColoredPrint.print_step("提交初始代码")
         if not run_command(["git", "commit", "-m", "initialize project"]):
             return False
 
-        print_success("Git 初始化完成")
+        ColoredPrint.print_success("Git 初始化完成")
         return True
 
     def install_dependencies():
         """安装 Python 依赖"""
-        print_header("步骤 2: 安装依赖")
+        ColoredPrint.print_header("步骤 2: 安装依赖")
 
         requirements_file = "./backend/requirements.txt"
         if not Path(requirements_file).exists():
-            print_warning(f"{requirements_file} 文件不存在，跳过依赖安装")
+            ColoredPrint.print_warning(f"{requirements_file} 文件不存在，跳过依赖安装")
             return True
 
-        print_step("安装 Python 依赖")
+        ColoredPrint.print_step("安装 Python 依赖")
         # todo: 此处的 pip 为什么正确？也确实使用了 requirements.txt，这意味着确实找到了这个文件啊。
         if run_command(["pip", "install", "-r", requirements_file], capture_output=True):
-            print_success("依赖安装完成")
+            ColoredPrint.print_success("依赖安装完成")
             return True
         return False
 
     def run_django_migrations():
         """执行 Django 迁移"""
-        print_header("步骤 3: Django 数据库迁移")
+        ColoredPrint.print_header("步骤 3: Django 数据库迁移")
 
         manage_py = "./backend/manage.py"
 
@@ -179,19 +180,19 @@ def main():
         print(Path(manage_py).resolve())
 
         if not Path(manage_py).exists():
-            print_error(f"{manage_py} 文件不存在，无法执行迁移")
+            ColoredPrint.print_error(f"{manage_py} 文件不存在，无法执行迁移")
             return False
 
-        print_step("生成数据库迁移文件")
+        ColoredPrint.print_step("生成数据库迁移文件")
 
         if not run_command(["python", manage_py, "makemigrations"]):
             return False
 
-        print_step("应用数据库迁移")
+        ColoredPrint.print_step("应用数据库迁移")
         if not run_command(["python", manage_py, "migrate"]):
             return False
 
-        print_success("数据库迁移完成")
+        ColoredPrint.print_success("数据库迁移完成")
         return True
 
     def getpass_windows(prompt="密码: "):
@@ -210,14 +211,14 @@ def main():
 
     def create_superuser():
         """创建 Django 超级用户"""
-        print_header("步骤 4: 创建超级用户")
+        ColoredPrint.print_header("步骤 4: 创建超级用户")
 
         manage_py = "./backend/manage.py"
         if not Path(manage_py).exists():
-            print_error(f"{manage_py} 文件不存在，无法创建超级用户")
+            ColoredPrint.print_error(f"{manage_py} 文件不存在，无法创建超级用户")
             return False
 
-        print_step("检查 admin 用户是否已存在")
+        ColoredPrint.print_step("检查 admin 用户是否已存在")
         check_user = run_command(
             ["python", manage_py, "shell", "-c",
              "from django.contrib.auth import get_user_model; "
@@ -227,10 +228,10 @@ def main():
         )
 
         if check_user and check_user.stdout.strip() == "True":
-            print_success("admin 用户已存在，跳过创建")
+            ColoredPrint.print_success("admin 用户已存在，跳过创建")
             return True
 
-        print_step("创建 admin 用户")
+        ColoredPrint.print_step("创建 admin 用户")
 
         # 获取用户输入
         print(f"{Colors.OKBLUE}请输入管理员信息:{Colors.ENDC}")
@@ -267,10 +268,10 @@ def main():
         stdout, stderr = process.communicate(input=f"{password}\n{password}\n")
 
         if process.returncode != 0:
-            print_error(f"创建超级用户失败: {stderr}")
+            ColoredPrint.print_error(f"创建超级用户失败: {stderr}")
             return False
 
-        print_success("管理员账户创建成功")
+        ColoredPrint.print_success("管理员账户创建成功")
         print(f"{Colors.OKGREEN}用户名: admin{Colors.ENDC}")
         return True
 
@@ -280,9 +281,9 @@ def main():
         sys.exit(1)
 
     if not Path(".").resolve().name == "your-project-name":  # 替换为实际项目名
-        print_warning("注意: 请在项目根目录运行此脚本")
+        ColoredPrint.print_warning("注意: 请在项目根目录运行此脚本")
 
-    # ------------------ 主函数 ------------------ #
+    # ------------------------------------ 主函数 ------------------------------------ #
 
     # todo: 好好参考一下此处 ai 生成的代码，很优雅的 POP（面向过程编程）
 
@@ -298,7 +299,7 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
 
     # 打印欢迎信息
-    print_header("项目初始化自动化工具")
+    ColoredPrint.print_header("项目初始化自动化工具")
     print(f"{Colors.OKBLUE}此脚本将自动执行以下步骤:{Colors.ENDC}")
     for i in range(len(steps)):
         print(f"{i}. {steps[i][0]}")
@@ -313,21 +314,21 @@ def main():
 
     all_success = True
     for name, func in steps:
-        print_header(f"开始: {name}")
+        ColoredPrint.print_header(f"开始: {name}")
         if not func():
-            print_error(f"{name} 步骤失败")
+            ColoredPrint.print_error(f"{name} 步骤失败")
             all_success = False
             break
 
     # 显示结果
-    print_header("初始化完成")
+    ColoredPrint.print_header("初始化完成")
     elapsed_time = time.time() - start_time
 
     if all_success:
-        print_success(f"所有步骤成功完成! 用时: {elapsed_time:.2f} 秒")
+        ColoredPrint.print_success(f"所有步骤成功完成! 用时: {elapsed_time:.2f} 秒")
         print(f"\n{Colors.OKGREEN}项目已准备就绪，可以开始开发了！{Colors.ENDC}")
     else:
-        print_error(f"初始化失败，部分步骤未完成。用时: {elapsed_time:.2f} 秒")
+        ColoredPrint.print_error(f"初始化失败，部分步骤未完成。用时: {elapsed_time:.2f} 秒")
         print(f"\n{Colors.WARNING}请检查错误信息并手动完成剩余步骤。{Colors.ENDC}")
 
     # 显示后续步骤
