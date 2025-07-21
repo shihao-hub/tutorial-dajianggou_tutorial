@@ -17,11 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
+    # django admin
     path('admin/', admin.site.urls),
+    # drf_spectacular
+    path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='api-schema'), name='swagger-ui'),
 
     path("blog/", include("apps.blog.urls")),
+    path("tasks/", include("apps.tasks.urls")),
 ]
 
 # 【知识点】django-debug-toolbar
