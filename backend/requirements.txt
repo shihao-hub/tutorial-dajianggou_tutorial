@@ -2,6 +2,8 @@ loguru
 
 django
 
+djangorestframework
+
 django-debug-toolbar # django-debug-toolbar is a very powerful performance detection tool for django
 djdt_flamegraph # [unused]
 
