@@ -45,14 +45,6 @@ def _log_error_details(error_id, timestamp, timestamp_isoformat, request, except
         f"USER: {_get_username(request)}"
     ]
 
-    if exception:
-        log_message.append(f"EXCEPTION: {type(exception).__name__}")
-        log_message.append(f"MESSAGE: {str(exception)}")
-
-    if full_stack and full_stack != "NoneType: None\n":
-        log_message.append("FULL STACK TRACE:")
-        log_message.append(full_stack)
-
     # 获取客户端 IP (安全方式)
     ip = request.META.get('HTTP_X_FORWARDED_FOR')
     if not ip:
@@ -62,8 +54,16 @@ def _log_error_details(error_id, timestamp, timestamp_isoformat, request, except
 
     log_message.append(f"CLIENT_IP: {ip}")
 
+    if exception:
+        log_message.append(f"EXCEPTION: {type(exception).__name__}")
+        log_message.append(f"MESSAGE: {str(exception)}")
+
+    if full_stack and full_stack != "NoneType: None\n":
+        log_message.append("FULL STACK TRACE:")
+        log_message.append(full_stack)
+
     # 记录到日志系统
-    logger.error('\n'.join(log_message))
+    logger.error("\n{}", '\n'.join(log_message))
 
 
 def _detailed_500_response(request, exception=None):

@@ -31,6 +31,7 @@ urlpatterns = [
     path("blog/", include("apps.blog.urls")),
     path("tasks/", include("apps.tasks.urls")),
     path("invitationcode/", include("apps.invitationcode.urls")),
+    path("auth2/", include("apps.auth2.urls")),
 ]
 
 # 【知识点】django-debug-toolbar

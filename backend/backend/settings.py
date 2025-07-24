@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.blog",
     "apps.tasks",
     "apps.invitationcode",
+    "apps.auth2",
 
     "debug_toolbar",
 ]
@@ -170,8 +171,9 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,  # 未认证时不设置匿名用户
     # 认证相关配置 [reference link](https://pythondjango.cn/django/rest-framework/5-permissions/)
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+
         # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
     ],
     # "URL_FIELD_NAME": 'link', # todo: [to be understood] URL_FIELD_NAME
