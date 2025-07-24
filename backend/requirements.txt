@@ -1,6 +1,8 @@
 loguru
 
 django
+django-filter
+django-extensions
 
 djangorestframework
 
@@ -11,6 +13,8 @@ django-silk # [unused]
 
 django-guardian # [unused] reference link: https://pythondjango.cn/django/advanced/8-permissions/
 
+whitenoise
+
 python-memcached # Memcached is a high-performance distributed in-memory object caching system
 ipython
 
@@ -20,3 +24,4 @@ eventlet
 django-celery-beat
 django-celery-results
 
+lupa
