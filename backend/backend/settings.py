@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "django_extensions",
     "rest_framework",
+    # "rest_framework.authtoken",
     "drf_spectacular",
 
     # 【知识点】为了弥补 Django 自带权限机制的不足
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.blog",
     "apps.tasks",
+    "apps.invitationcode",
 
     "debug_toolbar",
 ]
@@ -65,6 +68,8 @@ MIDDLEWARE = [
 
     # 【知识点】LocaleMiddleware 属于 Django 的国际化功能，这个中间件可以让我们不需要设置 settings.LANGUAGE_CODE
     "django.middleware.locale.LocaleMiddleware",
+
+    # "apps.core.middleware.GlobalExceptionMiddleware",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -87,6 +92,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+# 使用 django 自带的 sqlite3 存储 session
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -119,13 +127,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'  # 语言设置为简体中文
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'  # 时区设置为中国标准时间（东八区）
 
-USE_I18N = True
+USE_I18N = True  # 启用国际化（保持 True）
 
-USE_TZ = True
+USE_TZ = False  # 关闭时区支持（适用场景：如果你的用户和服务器都在中国，且不需要处理跨国时区问题。）
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -143,10 +151,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
-    # 返回 response 对象所用的类
+    # 返回 response 对象所用的类 -> DRF 会根据请求的 Accept 头来选择一个最合适的渲染器
     'DEFAULT_RENDER_CLASSES': [
         'rest_framework.renders.JSONRenderer',
-        'rest_framework.renders.BrowsableAPIRenderer',
+        'rest_framework.renders.BrowsableAPIRenderer',  # DRF 一般都是 restful 风格的接口，一般这个都是开发阶段才启用的
     ],
     # 解析器，如何解析 request 请求中的 request.data
     'DEFAULT_PARSER_CLASSES': [
@@ -154,19 +162,21 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ],
-    # 权限相关配置：必须登录才能调用接口
+    # 权限相关配置
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated', # 仅限已经通过身份验证的用户访问
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',  # 未经身份验证的请求将获得只读读的权限
     ],
     'UNAUTHENTICATED_USER': None,  # 未认证时不设置匿名用户
-    # 认证相关配置
+    # 认证相关配置 [reference link](https://pythondjango.cn/django/rest-framework/5-permissions/)
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     ],
     # "URL_FIELD_NAME": 'link', # todo: [to be understood] URL_FIELD_NAME
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # drf_spectacular 接口文档生成
+    'EXCEPTION_HANDLER': 'apps.core.exceptions.global_exception_handler'
 }
 
 # ------------------------------------ python-memcached ------------------------------------ #

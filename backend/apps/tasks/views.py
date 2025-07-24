@@ -50,6 +50,8 @@ create index if not exists idx_name on tasks(name);
 
 """
 
+from lupa.luajit20 import LuaRuntime
+
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render
 from django.http import HttpResponse, HttpRequest
@@ -60,7 +62,13 @@ from . import models, forms
 
 class TestView(generic.View):
     def get(self, request: HttpRequest):
-        return HttpResponse(f"method: {request.method} path: {request.path}".encode())
+        lua = LuaRuntime()
+        g = lua.globals()
+        g.request = request
+        lua.execute("""
+        print(request.path)
+        """)
+        return HttpResponse(f"method: {lua.eval("request.method")} path: {request.path}".encode())
 
     # def post(self, request: HttpRequest):
     #     return HttpResponse(f"method: {request.method} path: {request.path}".encode())

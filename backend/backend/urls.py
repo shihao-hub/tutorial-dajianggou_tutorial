@@ -25,9 +25,12 @@ urlpatterns = [
     # drf_spectacular
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='api-schema'), name='swagger-ui'),
+    # drf
+    path('api-auth/', include('rest_framework.urls')),  # 用户登录页面
 
     path("blog/", include("apps.blog.urls")),
     path("tasks/", include("apps.tasks.urls")),
+    path("invitationcode/", include("apps.invitationcode.urls")),
 ]
 
 # 【知识点】django-debug-toolbar
