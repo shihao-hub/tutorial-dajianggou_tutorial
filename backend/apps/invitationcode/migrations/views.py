@@ -1,10 +1,10 @@
 from django.utils.timezone import now
-from django.contrib import messages
-from rest_framework import views, generics, viewsets
+from rest_framework import views, generics, viewsets, permissions
 from rest_framework.request import Request
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiExample
 
-from . import models
+from . import models, serializers
 
 
 def get_client_ip(request):
@@ -17,16 +17,29 @@ def get_client_ip(request):
     return ip
 
 
-class InvitationCodeAPIView(views.APIView):
+class InvitationCodePageView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request: Request):
+        """访问验证码页面，根据 session 响应不同内容"""
+        session_key = f"user_ip_{get_client_ip(request)}"
+        if session_key in request.session:
+            return Response(data={"message": "验证码有效，展示隐私内容"})
+        return Response(data={"message": "验证码无效，无法查看隐私内容"})
+
+
+class InvitationCodeValidationView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(request=serializers.InvitationCodeValidationSerializer)
     def post(self, request: Request):
         """验证邀请码是否正确"""
         session_key = f"user_ip_{get_client_ip(request)}"
-        # todo: 确定一下，post 不是创建吗？这样的话，验证的语义在哪里表达呢？好麻烦，restful api，怪异。。
         # todo: 确定一下，如果前台发送的是表单，request.data 和 application/json 结构一样吗？
-        code = request.data["code"]
-        # todo: Schema
-        if not code:
-            return Response({"message": "请求格式不正确"}, status=400)
+        serializer = serializers.InvitationCodeValidationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"message": "请求格式不正确", "error": serializer.errors}, status=400)
+        code = serializer.validated_data["code"]
         # 获得验证码
         code_inst = models.InvitationCode.objects.filter(code=code, expire__gte=now()).first()
         if not code_inst:
@@ -39,10 +52,3 @@ class InvitationCodeAPIView(views.APIView):
         request.session[session_key] = code_inst.pk
         request.session.set_expiry(60)  # 整个 session？不能指定 key 吗？
         return Response(data={"message": "验证码有效，会话有效时间为 60s"})
-
-    def get(self, request: Request):
-        """访问验证码页面，根据 session 响应不同内容"""
-        session_key = f"user_ip_{get_client_ip(request)}"
-        if session_key in request.session:
-            return Response(data={"message": "验证码有效，展示隐私内容"})
-        return Response(data={"message": "验证码无效，无法查看隐私内容"})
