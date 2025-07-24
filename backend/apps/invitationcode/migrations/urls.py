@@ -9,5 +9,7 @@ from . import views
 app_name = "invitationcode"
 urlpatterns = [
     # todo: 确定一下 drf 中 path 的 name 参数还有什么用吗？
-    path("", views.InvitationCodeAPIView.as_view()),
+    path("", views.InvitationCodePageView.as_view()),
+    # 【知识点】POST -> 创建资源或执行操作
+    path("validate/", views.InvitationCodeValidationView.as_view()),
 ]
