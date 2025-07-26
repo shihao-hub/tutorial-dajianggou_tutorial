@@ -1,10 +1,11 @@
 from django.utils.timezone import now
+import django_filters
 from rest_framework import views, generics, viewsets, permissions
 from rest_framework.request import Request
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiExample
 
-from . import models, serializers
+from . import models, serializers, schemas, filters
 
 
 def get_client_ip(request):
@@ -31,12 +32,12 @@ class InvitationCodePageView(views.APIView):
 class InvitationCodeValidationView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
-    @extend_schema(request=serializers.InvitationCodeValidationSerializer)
+    @extend_schema(request=schemas.InvitationCodeValidationSchema)
     def post(self, request: Request):
         """验证邀请码是否正确"""
         session_key = f"user_ip_{get_client_ip(request)}"
         # todo: 确定一下，如果前台发送的是表单，request.data 和 application/json 结构一样吗？
-        serializer = serializers.InvitationCodeValidationSerializer(data=request.data)
+        serializer = schemas.InvitationCodeValidationSchema(data=request.data)
         if not serializer.is_valid():
             return Response({"message": "请求格式不正确", "error": serializer.errors}, status=400)
         code = serializer.validated_data["code"]
@@ -52,3 +53,14 @@ class InvitationCodeValidationView(views.APIView):
         request.session[session_key] = code_inst.pk
         request.session.set_expiry(60)  # 整个 session？不能指定 key 吗？
         return Response(data={"message": "验证码有效，会话有效时间为 60s"})
+
+
+class InvitationCodeListView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = models.InvitationCode.objects.all().order_by("code")
+    serializer_class = serializers.InvitationCodeSerializer
+
+    # 设置新的 DRF 过滤后台和过滤类
+    # filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    # filter_class = filters.InvitationCodeFilter
+    filterset_fields = ("code",)  # 添加这个后 DRF 前台才会显示 django-filters 的过滤器，而且默认是精确匹配...
