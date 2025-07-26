@@ -1,29 +1,24 @@
-loguru
-
 django
 django-filter
 django-extensions
-
-djangorestframework
-drf_spectacular
-
 django-debug-toolbar # django-debug-toolbar is a very powerful performance detection tool for django
 djdt_flamegraph # [unused]
-
 django-silk # [unused]
-
 django-guardian # [unused] reference link: https://pythondjango.cn/django/advanced/8-permissions/
-
+djangorestframework
+djangorestframework-simplejwt
+drf_spectacular
 whitenoise
-
-python-memcached # Memcached is a high-performance distributed in-memory object caching system
-ipython
-notebook
-
 celery # [unused] reference link: https://pythondjango.cn/django/advanced/12-sync-periodic-tasks-with-celery/
 redis
 eventlet
 django-celery-beat
 django-celery-results
+django-ninja
 
+python-memcached # Memcached is a high-performance distributed in-memory object caching system
+ipython
+jupyter
+loguru
 lupa
+aiohttp
