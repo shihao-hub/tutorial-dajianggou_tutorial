@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,9 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "django_filters",
     "django_extensions",
     "rest_framework",
-    # "rest_framework.authtoken",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "drf_spectacular",
 
     # 【知识点】为了弥补 Django 自带权限机制的不足
@@ -46,7 +48,7 @@ INSTALLED_APPS = [
     # - 如果我们希望实现对单个文章对象的权限管理，我们需要借助于第三方库比如 django-guardian
     # "guardian",
 
-    "apps.core",
+    "apps.core",  # todo: 确定一下，INSTALLED_APPS 到底做了那些事情
     "apps.blog",
     "apps.tasks",
     "apps.invitationcode",
@@ -149,8 +151,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ------------------------------------ djangorestframework ------------------------------------ #
 # drf 配置字典
 REST_FRAMEWORK = {
+    # 【知识点】DRF 分页，PageNumberPagination 是常用的普通分页器，此处配置之后，似乎 DRF 一些类默认就支持分页了。
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50,
+    'PAGE_SIZE': 10,  # 每页展示的记录数
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
     # 返回 response 对象所用的类 -> DRF 会根据请求的 Accept 头来选择一个最合适的渲染器
     'DEFAULT_RENDER_CLASSES': [
@@ -172,13 +175,40 @@ REST_FRAMEWORK = {
     # 认证相关配置 [reference link](https://pythondjango.cn/django/rest-framework/5-permissions/)
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
 
         # 'rest_framework.authentication.BasicAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
     ],
+    # 【知识点】全局使用限流类
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/min',
+        'user': '10/min'
+    },
     # "URL_FIELD_NAME": 'link', # todo: [to be understood] URL_FIELD_NAME
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # drf_spectacular 接口文档生成
-    'EXCEPTION_HANDLER': 'apps.core.exceptions.global_exception_handler'
+    'EXCEPTION_HANDLER': 'apps.core.exceptions.global_exception_handler',  # noqa
+    # 【知识点】把 DjangoFilterBackend 设为 DRF 的过滤后台
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+# ------------------------------------ rest_framework_simplejwt ------------------------------------ #
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60 * 12),  # Access Token 有效期
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Refresh Token 有效期
+    # 'ROTATE_REFRESH_TOKENS': False,  # 是默认值 -> 是否允许刷新 Refresh Token
+    # 'BLACKLIST_AFTER_ROTATION': True,  # 是默认值 -> 刷新后黑名单旧令牌
+    # 'ALGORITHM': 'HS256',  # 是默认值 -> 加密算法
+    # 'SIGNING_KEY': SECRET_KEY,  # 是默认值 -> 签名密钥
+    # 'AUTH_HEADER_TYPES': ('Bearer',),  # 是默认值 -> 认证头类型
+    # 'USER_ID_FIELD': 'id',  # 是默认值 -> 用户 ID 字段
+    # 'USER_ID_CLAIM': 'user_id',  # 是默认值 -> 用户 ID 在 JWT 中的声明
+    'UPDATE_LAST_LOGIN': True,  # 更新用户最后登录时间
 }
 
 # ------------------------------------ python-memcached ------------------------------------ #
