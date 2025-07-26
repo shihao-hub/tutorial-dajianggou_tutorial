@@ -12,4 +12,6 @@ urlpatterns = [
     path("", views.InvitationCodePageView.as_view()),
     # 【知识点】POST -> 创建资源或执行操作
     path("validate/", views.InvitationCodeValidationView.as_view()),
+
+    path("list/", views.InvitationCodeListView.as_view()),
 ]
