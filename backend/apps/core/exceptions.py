@@ -117,6 +117,7 @@ def _detailed_500_response(request, exception=None):
     return Response(response_data, status=500)
 
 
+# 【知识点】给 DRF 设置全局异常处理器，不会返回敏感信息，主要返回标记用的数据
 def global_exception_handler(exc, context):
     # 2025-07-23：以下内容由 ai 生成
 
