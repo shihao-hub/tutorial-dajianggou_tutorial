@@ -43,6 +43,7 @@ urlpatterns = [
     path("v1/tasks/", include("apps.tasks.urls")),
     path("v1/invitationcode/", include("apps.invitationcode.urls")),
     path("v1/auth2/", include("apps.auth2.urls")),
+    path("v1/bookmanagement/", include("apps.bookmanagement.urls")),
 
     path("v1/ninja/api/", include("apps.api.urls")),
 ]
