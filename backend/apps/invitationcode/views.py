@@ -62,5 +62,5 @@ class InvitationCodeListView(generics.ListCreateAPIView):
 
     # 设置新的 DRF 过滤后台和过滤类
     # filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    # filter_class = filters.InvitationCodeFilter
-    filterset_fields = ("code",)  # 添加这个后 DRF 前台才会显示 django-filters 的过滤器，而且默认是精确匹配...
+    filter_class = filters.InvitationCodeFilter
+    # filterset_fields = ("code",)  # 添加这个后 DRF 前台才会显示 django-filters 的过滤器，而且默认是精确匹配...
