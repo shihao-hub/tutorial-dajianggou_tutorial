@@ -48,11 +48,13 @@ INSTALLED_APPS = [
     # - 如果我们希望实现对单个文章对象的权限管理，我们需要借助于第三方库比如 django-guardian
     # "guardian",
 
-    "apps.core",  # todo: 确定一下，INSTALLED_APPS 到底做了那些事情
+    "apps.api",  # todo: 确定一下，INSTALLED_APPS 到底做了那些事情
+    "apps.core",
     "apps.blog",
     "apps.tasks",
     "apps.invitationcode",
     "apps.auth2",
+    "apps.bookmanagement",
 
     "debug_toolbar",
 ]
@@ -185,11 +187,10 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
-
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '2/min',
-        'user': '10/min'
+        'anon': '2/s',
+        'user': '10/s'
     },
     # "URL_FIELD_NAME": 'link', # todo: [to be understood] URL_FIELD_NAME
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # drf_spectacular 接口文档生成
