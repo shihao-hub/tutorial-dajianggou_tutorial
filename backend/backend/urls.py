@@ -48,6 +48,13 @@ urlpatterns = [
     path("v1/ninja/api/", include("apps.api.urls")),
 ]
 
+# 仅在开发环境提供静态文件服务
+if settings.DEBUG:
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 # 【知识点】django-debug-toolbar
 # See https://juejin.cn/post/6844903720304508935
 if settings.DEBUG:

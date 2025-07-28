@@ -74,6 +74,8 @@ MIDDLEWARE = [
     # 【知识点】LocaleMiddleware 属于 Django 的国际化功能，这个中间件可以让我们不需要设置 settings.LANGUAGE_CODE
     "django.middleware.locale.LocaleMiddleware",
 
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     # "apps.core.middleware.GlobalExceptionMiddleware",
 ]
 
@@ -212,6 +214,9 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,  # 更新用户最后登录时间
 }
 
+# ------------------------------------ drf_spectacular ------------------------------------ #
+
+
 # ------------------------------------ python-memcached ------------------------------------ #
 # 【知识点】配置缓存
 #  问题：为什么要使用缓存Cache？回答：这是个通用问题，即缓存的作用（不包括 django，比如操作系统等也有）
@@ -240,3 +245,6 @@ INTERNAL_IPS = ["127.0.0.1"]
 #     'django.contrib.auth.backends.ModelBackend',
 #     'guardian.backends.ObjectPermissionBackend',
 # )
+
+# ------------------------------------ whitenoise ------------------------------------ #
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

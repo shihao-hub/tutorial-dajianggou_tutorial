@@ -1,3 +1,7 @@
+# gunicorn
+waitress
+waitress-dashboard
+
 django
 django-filter
 django-extensions
