@@ -6,7 +6,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r"", viewset=views.AuthViewSet, basename="auth")
 
-app_name = "auth"
+app_name = "auth2"
 
 urlpatterns = [
     # path("", views.LoginView.as_view(), name="login"),
