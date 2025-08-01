@@ -4,6 +4,9 @@ from loguru import logger
 
 from django.http.request import HttpRequest
 from django_filters import rest_framework as rest_framework_filters
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+
 from rest_framework import views, generics, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -31,5 +34,8 @@ class BookAdvancedAPIView(views.APIView):
         ret6 = models.Book.objects.filter(author__first_name="alex").values("name")
         logger.debug("{}", ret6)
         logger.debug("{}", ret6.query)
+
+        admin = User.objects.get(username="admin")
+        models.Book.objects.create(name="name1", author=admin, publisher="publisher1", year="2025")
 
         return Response({"message": "advanced!"})
