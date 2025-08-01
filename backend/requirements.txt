@@ -1,9 +1,10 @@
 # gunicorn
 waitress
-waitress-dashboard
 
 django
 django-filter
+django-tables2 # django admin -> Customizing Table Display Fields
+django-widget-tweaks # django admin -> User beautification AbilityForm
 django-extensions
 django-debug-toolbar # django-debug-toolbar is a very powerful performance detection tool for django
 djdt_flamegraph # [unused]
