@@ -6,3 +6,6 @@ class MyUser(models.Model):
     username = models.CharField(verbose_name="用户名", max_length=255, unique=True)
     password = models.CharField(verbose_name="密码", max_length=255)
     is_active = models.BooleanField(verbose_name="是否激活", default=True)
+
+    class Meta:
+        verbose_name = verbose_name_plural = "自定义用户"
