@@ -157,7 +157,7 @@ def main():
         """安装 Python 依赖"""
         ColoredPrint.print_header("步骤 2: 安装依赖")
 
-        requirements_file = "./backend/requirements.txt"
+        requirements_file = "requirements.txt"
         if not Path(requirements_file).exists():
             ColoredPrint.print_warning(f"{requirements_file} 文件不存在，跳过依赖安装")
             return True
