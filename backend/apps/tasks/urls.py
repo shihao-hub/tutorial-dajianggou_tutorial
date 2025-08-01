@@ -40,32 +40,13 @@ app_name = "tasks"
 urlpatterns = [
     path("test/", views.TestView.as_view(), name="test"),
 
+    # 【知识点】App 的核心作用：模块化开发（将大型项目拆分为功能独立的模块，每个 App 专注于特定功能领域）、功能封装（每个 App 包含完整的 MVC 组件）、代码复用（设计良好的 App 可跨项目复用） # noqa
+    # 【知识点】App 的设计哲学：Do One Thing Well" 原则（每个 App 应专注于解决一个核心问题）、松耦合架构（App 之间通过定义良好的接口通信）
     path("", views.TaskListView.as_view(), name="task_list"),
-
     path("create/", views.TaskCreateView.as_view(), name="task_create"),
     path("delete/<int:pk>/", views.TaskDeleteView.as_view(), name="task_delete"),
     path("update/<int:pk>/", views.TaskUpdateView.as_view(), name="task_update"),
     path("detail/<int:pk>/", views.TaskDetailView.as_view(), name="task_detail"),
 ]
-
-
-# djangorestframework
-def _register_djangorestframework_urls():
-    from rest_framework import routers, serializers
-    from . import drf_views  # just a test
-
-    global urlpatterns
-
-    router = routers.DefaultRouter()
-    # 【知识点】drf 的 router 末尾不允许添加 / ！
-    #  此处符合 restful 风格，批量生成了：
-    #   - /tasks/drf/ -> get - 列出列表、post - 创建实例
-    #   - /tasks/drf/<int:pk>/ -> put - 全量更新、patch - 部分更新、get - 查询详情、delete - 删除实例
-    router.register(r"drf", viewset=drf_views.TaskViewSet)
-
-    urlpatterns += router.urls
-
-
-_register_djangorestframework_urls()
 
 # urlpatterns = format_suffix_patterns(urlpatterns)
