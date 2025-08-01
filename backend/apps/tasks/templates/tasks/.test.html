@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务列表管理器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .task-stats {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+            font-weight: 500;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .task-info {
+            flex-grow: 1;
+        }
+
+        .task-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .task-desc {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            margin-top: 15px;
+            gap: 15px;
+        }
+
+        .task-meta div {
+            font-size: 0.9rem;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-delete {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+
+        .btn-update {
+            background: linear-gradient(to right, #38ef7d, #11998e);
+            color: white;
+        }
+
+        .btn-add {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .no-tasks {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .priority-high {
+            border-left: 4px solid #ff416c;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #ffa62b;
+        }
+
+        .priority-low {
+            border-left: 4px solid #38ef7d;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #b45309;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        @media (max-width: 600px) {
+            .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-actions {
+                align-self: flex-end;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> 我的任务列表</h1>
+            <p>管理您的日常任务，提高工作效率</p>
+        </header>
+
+        <div class="task-stats">
+            <div class="stat">
+                <div class="stat-label">总任务数</div>
+                <div class="stat-value">7</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">待处理</div>
+                <div class="stat-value">3</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">已完成</div>
+                <div class="stat-value">4</div>
+            </div>
+        </div>
+
+        <div class="task-list">
+            <div class="task-card priority-high">
+                <div class="task-info">
+                    <div class="task-title">
+                        项目方案设计
+                        <span class="task-status status-pending">待处理</span>
+                    </div>
+                    <div class="task-desc">完成项目需求分析和整体架构设计，编写设计文档。</div>
+                    <div class="task-meta">
+                        <div><i class="far fa-calendar"></i> 截止: 8月10日</div>
+                        <div><i class="fas fa-bolt"></i> 高优先级</div>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="btn btn-update"><i class="fas fa-edit"></i> 更新</button>
+                    <button class="btn btn-delete"><i class="fas fa-trash-alt"></i> 删除</button>
+                </div>
+            </div>
+
+            <div class="task-card priority-medium">
+                <div class="task-info">
+                    <div class="task-title">
+                        团队周会准备
+                        <span class="task-status status-pending">待处理</span>
+                    </div>
+                    <div class="task-desc">整理本周工作成果和下周计划，准备汇报内容。</div>
+                    <div class="task-meta">
+                        <div><i class="far fa-calendar"></i> 截止: 8月7日</div>
+                        <div><i class="fas fa-bolt"></i> 中优先级</div>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="btn btn-update"><i class="fas fa-edit"></i> 更新</button>
+                    <button class="btn btn-delete"><i class="fas fa-trash-alt"></i> 删除</button>
+                </div>
+            </div>
+
+            <div class="task-card priority-low">
+                <div class="task-info">
+                    <div class="task-title">
+                        学习新技术资料
+                        <span class="task-status status-completed">已完成</span>
+                    </div>
+                    <div class="task-desc">阅读最新技术文档并整理学习笔记，掌握新框架核心功能。</div>
+                    <div class="task-meta">
+                        <div><i class="far fa-calendar"></i> 截止: 8月5日</div>
+                        <div><i class="fas fa-bolt"></i> 低优先级</div>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="btn btn-update"><i class="fas fa-edit"></i> 更新</button>
+                    <button class="btn btn-delete"><i class="fas fa-trash-alt"></i> 删除</button>
+                </div>
+            </div>
+
+            <div class="task-card priority-low">
+                <div class="task-info">
+                    <div class="task-title">
+                        客户需求会议
+                        <span class="task-status status-completed">已完成</span>
+                    </div>
+                    <div class="task-desc">与客户沟通项目需求细节，确认实现方案。</div>
+                    <div class="task-meta">
+                        <div><i class="far fa-calendar"></i> 截止: 8月3日</div>
+                        <div><i class="fas fa-bolt"></i> 低优先级</div>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="btn btn-update"><i class="fas fa-edit"></i> 更新</button>
+                    <button class="btn btn-delete"><i class="fas fa-trash-alt"></i> 删除</button>
+                </div>
+            </div>
+
+            <button class="btn btn-add"><i class="fas  fa-plus-circle"></i> 添加新任务</button>
+        </div>
+    </div>
+
+    <script>
+        // 添加任务按钮点击事件
+        document.querySelector('.btn-add').addEventListener('click', function() {
+            alert('添加新任务功能开启！');
+        });
+
+        // 删除按钮点击事件
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if(confirm('确定要删除此任务吗？')) {
+                    const taskCard = e.target.closest('.task-card');
+                    taskCard.style.opacity = '0';
+                    setTimeout(() => {
+                        taskCard.remove();
+                        updateTaskStats();
+                    }, 300);
+                }
+            });
+        });
+
+        // 更新按钮点击事件
+        document.querySelectorAll('.btn-update').forEach(button => {
+            button.addEventListener('click', function() {
+                const taskTitle = this.closest('.task-card').querySelector('.task-title').innerText.split('\n')[0];
+                alert(`即将更新任务: ${taskTitle}`);
+            });
+        });
+
+        // 任务卡片点击效果
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if(!e.target.closest('.btn')) {
+                    this.style.backgroundColor = '#f9f9f9';
+                    setTimeout(() => {
+                        this.style.backgroundColor = '#fff';
+                    }, 300);
+                }
+            });
+        });
+
+        // 更新任务统计信息（模拟）
+        function updateTaskStats() {
+            const totalTasks = document.querySelectorAll('.task-card').length;
+            document.querySelector('.stat-value').textContent = totalTasks;
+
+            const pendingTasks = Math.max(0, Math.floor(totalTasks * 0.4));
+            const completedTasks = totalTasks - pendingTasks;
+
+            document.querySelectorAll('.stat-value')[1].textContent = pendingTasks;
+            document.querySelectorAll('.stat-value')[2].textContent = completedTasks;
+        }
+    </script>
+</body>
+</html>
