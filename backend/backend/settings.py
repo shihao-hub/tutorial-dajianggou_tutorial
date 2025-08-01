@@ -15,6 +15,10 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SOURCE_DIR = Path(__file__).resolve().parent.parent
+
+UPLOAD_DIR = SOURCE_DIR / "storage" / "upload"  # todo: 像这种文件夹不该放在源代码目录下吧？
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -37,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "django_filters",
+    "widget_tweaks",
+    "django_tables2",
     "django_extensions",
     "rest_framework",
     "rest_framework.authtoken",
@@ -55,6 +61,7 @@ INSTALLED_APPS = [
     "apps.invitationcode",
     "apps.auth2",
     "apps.bookmanagement",
+    "apps.users",
 
     "debug_toolbar",
 ]
@@ -78,6 +85,25 @@ MIDDLEWARE = [
 
     # "apps.core.middleware.GlobalExceptionMiddleware",
 ]
+
+# 【知识点】对于每次创建一个对象，想显示对应的 raw sql，需要在 settings 加上日志记录部分
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+    }
+}
 
 ROOT_URLCONF = 'backend.urls'
 
