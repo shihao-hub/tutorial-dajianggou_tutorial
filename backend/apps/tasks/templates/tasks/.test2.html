@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务状态显示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'status-notstart': {
+                            text: '#b45309',
+                            bg: '#fef9c3'
+                        },
+                        'status-inprogress': {
+                            text: '#1d4ed8',
+                            bg: '#dbeafe'
+                        },
+                        'status-completed': {
+                            text: '#15803d',
+                            bg: '#dcfce7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+        .status-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">任务状态显示</h1>
+        <p class="text-center text-gray-600 mb-12">三种状态的不同样式展示 - 尚未开始 / 正在进行中 / 已完成</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 尚未开始 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-amber-500 py-4">
+                    <h2 class="text-center text-white text-xl font-bold">尚未开始</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-notstart-text bg-status-notstart-bg status-badge">未开始</div>
+                            <div class="ml-4">准备阶段任务</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-notstart-text bg-status-notstart-bg status-badge">等待中</div>
+                            <div class="ml-4">等待确认的任务</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-notstart-text bg-status-notstart-bg status-badge">计划阶段</div>
+                            <div class="ml-4">本月计划任务</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 text-sm text-gray-600">
+                        <p>尚未开始的任务表示已创建但尚未启动的工作，通常处于计划阶段，等待执行条件满足或分配资源。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 正在进行中 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-blue-500 py-4">
+                    <h2 class="text-center text-white text-xl font-bold">正在进行中</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-inprogress-text bg-status-inprogress-bg status-badge">进行中</div>
+                            <div class="ml-4">当前主要任务</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-inprogress-text bg-status-inprogress-bg status-badge">实施阶段</div>
+                            <div class="ml-4">开发任务</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-inprogress-text bg-status-inprogress-bg status-badge">处理中</div>
+                            <div class="ml-4">客户请求处理</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 text-sm text-gray-600">
+                        <p>正在进行中的任务表示工作已经启动，处于执行阶段，可能需要协调资源或定期检查进度。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 已完成 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-emerald-500 py-4">
+                    <h2 class="text-center text-white text-xl font-bold">已完成</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-completed-text bg-status-completed-bg status-badge">已完成</div>
+                            <div class="ml-4">本周已完成工作</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-completed-text bg-status-completed-bg status-badge">结束</div>
+                            <div class="ml-4">上季度项目</div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-completed-text bg-status-completed-bg status-badge">完成</div>
+                            <div class="ml-4">交付任务</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 text-sm text-gray-600">
+                        <p>已完成的任务表示工作已经结束，可以进行验收、交付或归档，通常需要确认完成情况后关闭任务。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">在任务列表中的应用</h2>
+
+            <div class="space-y-4">
+                <!-- 任务示例 1 -->
+                <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center">
+                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                        <div class="ml-4">
+                            <h3 class="font-medium text-gray-800">项目需求分析</h3>
+                            <p class="text-sm text-gray-600">收集并整理客户需求文档</p>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-notstart-text bg-status-notstart-bg status-badge">尚未开始</div>
+                </div>
+
+                <!-- 任务示例 2 -->
+                <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center">
+                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                        <div class="ml-4">
+                            <h3 class="font-medium text-gray-800">系统开发实现</h3>
+                            <p class="text-sm text-gray-600">编写核心业务逻辑代码</p>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-inprogress-text bg-status-inprogress-bg status-badge">正在进行中</div>
+                </div>
+
+                <!-- 任务示例 3 -->
+                <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center">
+                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                        <div class="ml-4">
+                            <h3 class="font-medium text-gray-800">项目验收测试</h3>
+                            <p class="text-sm text-gray-600">执行完整的测试流程并修复问题</p>
+                        </div>
+                    </div>
+                    <div class="text-sm font-medium rounded-lg px-3 py-1.5 text-status-completed-text bg-status-completed-bg status-badge">已完成</div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="font-semibold text-gray-700 mb-3">状态颜色规范</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex items-center p-3 rounded-lg bg-status-notstart-bg">
+                        <div class="w-5 h-5 rounded-full bg-amber-500 mr-3"></div>
+                        <span class="text-status-notstart-text font-medium">尚未开始：琥珀色系</span>
+                    </div>
+                    <div class="flex items-center p-3 rounded-lg bg-status-inprogress-bg">
+                        <div class="w-5 h-5 rounded-full bg-blue-500 mr-3"></div>
+                        <span class="text-status-inprogress-text font-medium">正在进行：蓝色系</span>
+                    </div>
+                    <div class="flex items-center p-3 rounded-lg bg-status-completed-bg">
+                        <div class="w-5 h-5 rounded-full bg-emerald-500 mr-3"></div>
+                        <span class="text-status-completed-text font-medium">已完成：绿色系</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
