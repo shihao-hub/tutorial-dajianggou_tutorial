@@ -50,17 +50,92 @@ create index if not exists idx_name on tasks(name);
 
 """
 
+from typing import override
+
 from lupa.luajit20 import LuaRuntime
 
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.views import generic
 
 from . import models, forms
 
 
+class TaskListView(generic.ListView):
+    model = models.Task
+    # todo: 确定一下 is_deleted 有没有什么更好的办法？直接修改 django 根本函数？好麻烦，软删除。
+    queryset = models.Task.objects.filter(is_deleted=False).all()
+    context_object_name = "tasks"
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @override
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context.update({
+            "total_tasks": models.Task.objects.filter(is_deleted=False).count(),
+            "pending_tasks": models.Task.objects.filter(is_deleted=False,
+                                                        status__in=[models.TaskStatus.UNSTARTED,
+                                                                    models.TaskStatus.ONGOING]).count(),
+            "completed_tasks": models.Task.objects.filter(is_deleted=False, status=models.TaskStatus.FINISHED).count(),
+        })
+        return context
+
+
+class TaskCreateView(generic.CreateView):
+    model = models.Task
+    queryset = models.Task.objects.filter(is_deleted=False).all()
+    form_class = forms.TaskForm
+    success_url = reverse_lazy("tasks:task_list")  # 创建成功后，预期跳转至列表页面
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class TaskDeleteView(generic.DeleteView):
+    model = models.Task
+    queryset = models.Task.objects.filter(is_deleted=False).all()
+    success_url = reverse_lazy("tasks:task_list")  # 删除成功后，预期跳转至列表页面
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+        self.object.is_deleted = True
+        self.object.save()
+        return HttpResponseRedirect(success_url)
+
+
+class TaskUpdateView(generic.UpdateView):
+    model = models.Task
+    form_class = forms.TaskForm
+    success_url = reverse_lazy("tasks:task_list")  # 更新成功后，预期跳转至列表页面
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class TaskDetailView(generic.DetailView):
+    model = models.Task
+    queryset = models.Task.objects.filter(is_deleted=False).all()
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+# ==================================== TestView ==================================== #
 class TestView(generic.View):
+    """实践一下 django 的 generic.View"""
+
     def get(self, request: HttpRequest):
         lua = LuaRuntime()
         g = lua.globals()
@@ -81,53 +156,3 @@ class TestView(generic.View):
 
     def delete(self, request: HttpRequest):
         return HttpResponse(f"method: {request.method} path: {request.path}".encode())
-
-
-class TaskListView(generic.ListView):
-    model = models.Task
-    context_object_name = "tasks"
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class TaskCreateView(generic.CreateView):
-    model = models.Task
-    form_class = forms.TaskForm
-    success_url = reverse_lazy("tasks:task_list")  # 创建成功后，预期跳转至列表页面
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-
-class TaskDeleteView(generic.DeleteView):
-    model = models.Task
-    success_url = reverse_lazy("tasks:task_list")  # 删除成功后，预期跳转至列表页面
-
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        return super().form_valid(form)
-
-
-class TaskUpdateView(generic.UpdateView):
-    model = models.Task
-    form_class = forms.TaskForm
-    success_url = reverse_lazy("tasks:task_list")  # 更新成功后，预期跳转至列表页面
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-
-
-class TaskDetailView(generic.DetailView):
-    model = models.Task
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
