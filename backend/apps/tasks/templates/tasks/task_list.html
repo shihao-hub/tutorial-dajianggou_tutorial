@@ -1,18 +1,166 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <title>Task List</title>
- </head>
- <body>
- <h3>Task List</h3>
- {% for task in tasks %}
-     <p>{{ forloop.counter }}. {{ task.name }} - {{ task.get_status_display }}
-         (<a href="{% url 'tasks:task_update' task.id %}">Update</a> |
-         <a href="{% url 'tasks:task_delete' task.id %}">Delete</a>)
-     </p>
- {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "status-notstart": {
+                            text: "#b45309",
+                            bg: "#fef9c3"
+                        },
+                        "status-inprogress": {
+                            text: "#1d4ed8",
+                            bg: "#dbeafe"
+                        },
+                        "status-completed": {
+                            text: "#15803d",
+                            bg: "#dcfce7"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body style="
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    color: #333;
+">
+<div class="container flex flex-col mx-auto mt-10 text-center font-bold w-2/3">
+    <div class="mx-auto w-full space-y-4">
+        <div class="flex flex-col gap-4 w-3/5 m-auto">
+            <div class="text-center flex flex-col space-y-4">
+                <div class="text-5xl text-white flex mx-auto gap-2">
+                    <div class="justify-self-center">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    我的任务列表
+                </div>
+                <p class="text-white font-normal">管理您的日常任务，提高工作效率</p>
+            </div>
 
- <p> <a href="{% url 'tasks:task_create' %}"> + Add A New Task</a></p>
- </body>
- </html>
+            <div class="flex justify-around w-full m-auto bg-gray-100 rounded-lg py-3 text-white bg-opacity-30">
+                <div>
+                    <div>总任务数</div>
+                    <div class="text-2xl">{{ total_tasks }}</div>
+                </div>
+
+                <div>
+                    <div>待处理</div>
+                    <div class="text-2xl">{{ pending_tasks }}</div>
+                </div>
+
+                <div>
+                    <div>已完成</div>
+                    <div class="text-2xl">{{ completed_tasks }}</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-begin w-full m-auto gap-y-4">
+                {% for task in tasks %}
+                    <div class="
+                        flex justify-between bg-white px-4 py-6 rounded-lg shadow-md
+                        transition-all          <!-- 添加过渡动画 -->
+                        duration-200            <!-- 动画时长 -->
+                        ease-in-out             <!-- 平滑缓动曲线 -->
+                        hover:translate-y-[-4px] <!-- 悬停时向上微移 -->
+                        hover:shadow-lg         <!-- 悬停时阴影增强 -->
+                        active:translate-y-0    <!-- 点击时复位 -->
+                        active:shadow-md        <!-- 点击时阴影减弱 -->
+                    ">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2">
+                                <div class="text-2xl">{{ task.name }}</div>
+
+                                {# 确定一下，能不能在 django view 层处理？毕竟状态如果新增呢？似乎不太能行。 #}
+                                {% if task.status == "u" %}
+                                    <div class="text-sm rounded-lg px-2 text-amber-600 bg-amber-200">{{ task.get_status_display }}</div>
+                                {% elif task.status == "o" %}
+                                    <div class="text-sm rounded-lg px-2 text-blue-600 bg-blue-200">{{ task.get_status_display }}</div>
+                                {% else %}
+                                    <div class="text-sm rounded-lg px-2 text-green-600 bg-green-200">{{ task.get_status_display }}</div>
+                                {% endif %}
+
+                            </div>
+
+                            <div class="text-left text-gray-500 font-semibold">
+                                {{ task.content }}
+                            </div>
+
+
+                            <div class="text-gray-400 text-sm font-medium flex justify-start mt-2 gap-4">
+                                <div id="due_date_label">
+                                    <i class="far fa-calendar"></i>
+                                    截止日期：
+                                    {% if task.due_date %}
+                                        {{ task.due_date }}
+                                    {% else %}
+                                        无
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <i class="fas fa-bolt"></i>
+                                    高优先级
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-white flex items-center gap-2">
+                            <a class="rounded px-4 py-2 flex gap-x-2 hover:cursor-pointer"
+                               style="background: linear-gradient(to right, #38ef7d, #11998e);"
+                               href="{% url 'tasks:task_update' task.id %}">
+                                <div class="justify-self-center">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                更新
+                            </a>
+
+                            <a class="rounded px-4 py-2 flex gap-x-2 hover:cursor-pointer"
+                               style="background: linear-gradient(to right, #ff416c, #ff4b2b);"
+                               href="{% url 'tasks:task_delete' task.id %}">
+                                <div class="justify-self-center">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+                                删除
+                            </a>
+                        </div>
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="
+                    bg-blue-500 text-white text-lg rounded-md w-full py-4 px-4 flex justify-start gap-x-2
+                    transition-all          <!-- 添加过渡动画 -->
+                    duration-200            <!-- 动画时长 -->
+                    ease-in-out             <!-- 平滑缓动曲线 -->
+                    hover:translate-y-[-2px] <!-- 悬停时向上微移 -->
+                    hover:shadow-lg         <!-- 悬停时阴影增强 -->
+                    active:translate-y-0    <!-- 点击时复位 -->
+                    active:shadow-md        <!-- 点击时阴影减弱 -->
+                " style="background: linear-gradient(to right, #4facfe, #00f2fe);">
+                <div class="justify-self-center">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <button>
+                    <a href="{% url 'tasks:task_create' %}">添加新任务</a>
+                </button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
